@@ -6,8 +6,8 @@
 #include "Game.h"
 
 
-#define JUMP_ANGLE_STEP 4
-#define JUMP_HEIGHT 72
+#define JUMP_ANGLE_STEP 6
+#define JUMP_HEIGHT 55
 #define FALL_STEP 4
 
 
@@ -15,7 +15,6 @@ enum PlayerAnims
 {
 	STAND_LEFT, STAND_RIGHT, MOVE_LEFT, MOVE_RIGHT
 };
-
 
 void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
@@ -93,7 +92,6 @@ void Player::update(int deltaTime)
 		}
 		else if (sprite->animation() == MOVE_RIGHT) {
 			sprite->changeAnimation(STAND_RIGHT);
-		
 		}
 	}
 	
