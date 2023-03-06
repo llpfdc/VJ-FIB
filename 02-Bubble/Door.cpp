@@ -18,22 +18,24 @@ enum DoorAnims {
 
 
 void Door::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) {
-	spritesheet.loadFromFile("images/door.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	sprite = Sprite::createSprite(glm::ivec2(32, 64), glm::vec2(0.25, 0.25), &spritesheet, &shaderProgram);
+	spritesheet.loadFromFile("images/sprite_portal.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	sprite = Sprite::createSprite(glm::ivec2(48, 58), glm::vec2(0.125, 1), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(3);
-
+	
 	sprite->setAnimationSpeed(DOOR_CLOSED, 8);
 	sprite->addKeyframe(DOOR_CLOSED, glm::vec2(0.f, 0.f));
 
-	sprite->setAnimationSpeed(DOOR_OPENING, 8);
-	sprite->addKeyframe(DOOR_OPENING, glm::vec2(0.f, 0.16f));
-	sprite->addKeyframe(DOOR_OPENING, glm::vec2(0.f, 0.33f));
-	sprite->addKeyframe(DOOR_OPENING, glm::vec2(0.f, 0.5f));
-	sprite->addKeyframe(DOOR_OPENING, glm::vec2(0.f, 0.66f));
+	sprite->setAnimationSpeed(DOOR_OPENING, 2);
+	sprite->addKeyframe(DOOR_OPENING, glm::vec2(0.125f, 0.0f));
+	sprite->addKeyframe(DOOR_OPENING, glm::vec2(0.25f, 0.0f));
 
-	sprite->setAnimationSpeed(DOOR_OPENED, 8);
-	sprite->addKeyframe(DOOR_OPENED, glm::vec2(0., 0.83f));
-
+	sprite->setAnimationSpeed(DOOR_OPENED, 2);
+	sprite->addKeyframe(DOOR_OPENED, glm::vec2(0.375f, 0.0f));
+	sprite->addKeyframe(DOOR_OPENED, glm::vec2(0.5f, 0.0f));
+	sprite->addKeyframe(DOOR_OPENED, glm::vec2(0.625f, 0.0f));
+	sprite->addKeyframe(DOOR_OPENED, glm::vec2(0.75f, 0.0f));
+	sprite->addKeyframe(DOOR_OPENED, glm::vec2(0.875f, 0.0f));
+	
 	sprite->changeAnimation(0);
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posDoor.x), float(tileMapDispl.y + posDoor.y)));
@@ -41,13 +43,34 @@ void Door::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) {
 }
 
 void Door::update(int deltaTime) {
-	sprite->update(deltaTime);
-	if (opened) {
-		if (sprite->animation() != DOOR_OPENING)
-			sprite->changeAnimation(DOOR_OPENING);
+	sprite->update(deltaTime);/*
+	 if (opened && sprite->animation() == DOOR_CLOSED) {
+		sprite->changeAnimation(DOOR_OPENING);
+		timerDoor = deltaTime;
+		
+		cout << "open" << endl;
+	 }
+	 else  if (opened && sprite->animation() == DOOR_OPENING && deltaTime - timerDoor >= 1300 && timerDoor != -1) {
+			sprite->changeAnimation(DOOR_OPENED);
+			timerDoor = -1;
+			cout << "opening" << endl;
 	}
-	else {
+	else if(!opened) {
 		sprite->changeAnimation(DOOR_CLOSED);
+		cout << "closed" << endl;
+	}*/
+	
+	if (opened && sprite->animation() == DOOR_CLOSED) {
+		sprite->changeAnimation(DOOR_OPENING);
+		cout << "open" << endl;
+		timerDoor += deltaTime;
+	}
+	if (opened && sprite->animation() == DOOR_OPENING) {
+		timerDoor += deltaTime;
+	}
+	if (opened && sprite->animation() == DOOR_OPENING && timerDoor >= 1000) {
+		opening = false;
+		sprite->changeAnimation(DOOR_OPENED);
 	}
 }
 

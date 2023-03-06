@@ -19,30 +19,31 @@ class TileMap
 {
 
 private:
-	TileMap(const string &levelFile, const glm::vec2 &minCoords, ShaderProgram &program);
+	TileMap(const string& levelFile, const glm::vec2& minCoords, ShaderProgram& program);
 
 public:
 	// Tile maps can only be created inside an OpenGL context
-	static TileMap *createTileMap(const string &levelFile, const glm::vec2 &minCoords, ShaderProgram &program);
+	static TileMap* createTileMap(const string& levelFile, const glm::vec2& minCoords, ShaderProgram& program);
 
 	~TileMap();
 
-	void render() ;
+	void render();
 	void free();
-	
+
 	int getTileSize() const { return tileSize; }
 
-	bool collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size, bool isEnemy) ;
-	bool collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size, bool isEnemy) ;
-	bool collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY, bool isEnemy);
-	void colisionGroundTileLeft(const glm::ivec2& pos, const glm::ivec2& size) ;
+	bool collisionMoveLeft(const glm::ivec2& pos, const glm::ivec2& size, bool isEnemy);
+	bool collisionMoveRight(const glm::ivec2& pos, const glm::ivec2& size, bool isEnemy);
+	bool collisionMoveDown(const glm::ivec2& pos, const glm::ivec2& size, int* posY, bool isEnemy);
+	void colisionGroundTileLeft(const glm::ivec2& pos, const glm::ivec2& size);
 	void colisionGroundTileRight(const glm::ivec2& pos, const glm::ivec2& size);
-	bool loadLevel(const string &levelFile);
-	void prepareArrays(const glm::vec2 &minCoords, ShaderProgram &program);
+	bool loadLevel(const string& levelFile);
+	void prepareArrays(const glm::vec2& minCoords, ShaderProgram& program);
 	bool collisionMoveEnemy(const glm::ivec2& pos, const glm::ivec2& size, int* posY, bool& right) const;
 	vector<glm::ivec2> getEnemyPos();
 	glm::ivec2 getDoorPos();
 	bool doorOpened();
+	bool collisionMoveLeftHit(const glm::ivec2& pos, const glm::ivec2& size);
 private:
 	GLuint vao;
 	GLuint vbo;
@@ -52,8 +53,8 @@ private:
 	int tileSize, blockSize;
 	Texture tilesheet;
 	glm::vec2 tileTexSize;
-	int *map;
-	ShaderProgram ShProgram; 
+	int* map;
+	ShaderProgram ShProgram;
 	Sprite* sprite;
 	bool firstSprite = false;
 	Texture spritesheetSuelo;
@@ -66,9 +67,8 @@ private:
 	glm::ivec2 doorCoords;
 	vector<glm::ivec2> positionsEnemies;
 	bool showKey = true;
+	bool doorOpen = false;
 };
 
 
 #endif // _TILE_MAP_INCLUDE
-
-

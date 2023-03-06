@@ -58,7 +58,7 @@ void Player::update(int deltaTime)
 			sprite->changeAnimation(MOVE_LEFT);
 		posPlayer.x -= 2;
 		map->colisionGroundTileLeft(posPlayer, glm::ivec2(32, 32));
-		
+		map->collisionMoveLeftHit(posPlayer, glm::ivec2(32, 32));
 		if(map->collisionMoveLeft(posPlayer, glm::ivec2(32, 32),false))
 		{
 			posPlayer.x += 2;

@@ -23,9 +23,9 @@ Scene::Scene()
 
 Scene::~Scene()
 {
-	if(map != NULL)
+	if (map != NULL)
 		delete map;
-	if(player != NULL)
+	if (player != NULL)
 		delete player;
 	if (door != NULL)
 		delete door;
@@ -36,9 +36,10 @@ void Scene::init()
 {
 	initShaders();
 	map = TileMap::createTileMap("levels/level01.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+	initDoor();
 	initPlayer();
 	initEnemies();
-	initDoor();
+
 
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
@@ -53,7 +54,7 @@ void Scene::initPlayer() {
 void Scene::initDoor() {
 	door = new Door();
 	door->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	door->setPosition(glm::vec2((map->getDoorPos().x + 2)  * map->getTileSize(), map->getDoorPos().y * map->getTileSize()));
+	door->setPosition(glm::vec2((map->getDoorPos().x + 2) * map->getTileSize(), map->getDoorPos().y * map->getTileSize() - 10));
 	door->setTileMap(map);
 }
 
@@ -77,6 +78,7 @@ void Scene::update(int deltaTime)
 	}
 	if (map->doorOpened()) {
 		door->open();
+		alreadyOpen = true;
 	}
 	door->update(deltaTime);
 }
@@ -92,12 +94,13 @@ void Scene::render()
 	texProgram.setUniformMatrix4f("modelview", modelview);
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
 	map->render();
+	door->render();
 	player->render();
 	for (int i = 0; i < skeletons.size(); i++) {
 		skeletons[i]->render();
 	}
+
 	
-	door->render();
 
 }
 
@@ -106,13 +109,13 @@ void Scene::initShaders()
 	Shader vShader, fShader;
 
 	vShader.initFromFile(VERTEX_SHADER, "shaders/texture.vert");
-	if(!vShader.isCompiled())
+	if (!vShader.isCompiled())
 	{
 		cout << "Vertex Shader Error" << endl;
 		cout << "" << vShader.log() << endl << endl;
 	}
 	fShader.initFromFile(FRAGMENT_SHADER, "shaders/texture.frag");
-	if(!fShader.isCompiled())
+	if (!fShader.isCompiled())
 	{
 		cout << "Fragment Shader Error" << endl;
 		cout << "" << fShader.log() << endl << endl;
@@ -121,7 +124,7 @@ void Scene::initShaders()
 	texProgram.addShader(vShader);
 	texProgram.addShader(fShader);
 	texProgram.link();
-	if(!texProgram.isLinked())
+	if (!texProgram.isLinked())
 	{
 		cout << "Shader Linking Error" << endl;
 		cout << "" << texProgram.log() << endl << endl;
@@ -130,6 +133,3 @@ void Scene::initShaders()
 	vShader.free();
 	fShader.free();
 }
-
-
-
