@@ -25,6 +25,7 @@ public:
 	void render();
 	void initPlayer();
 	void initEnemies();
+	bool collide(glm::ivec2 positionSkeleton);
 	void initDoor();
 private:
 	void initShaders();

@@ -19,12 +19,9 @@ public:
 private:
 	glm::ivec2 tileMapDispl, posDoor;
 	bool opened = false;
-	bool opening = false;
 	Texture spritesheet;
 	Sprite* sprite;
 	TileMap* map;
 	int timerDoor = -1;
-	
-
 };
 #endif

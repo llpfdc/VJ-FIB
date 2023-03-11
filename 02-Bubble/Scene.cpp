@@ -9,7 +9,7 @@
 #define SCREEN_Y 16
 
 #define INIT_PLAYER_X_TILES 4
-#define INIT_PLAYER_Y_TILES 19
+#define INIT_PLAYER_Y_TILES 18
 
 #define INIT_SKELETON_X_TILES 10
 #define INIT_SKELETON_Y_TILES 4
@@ -39,8 +39,6 @@ void Scene::init()
 	initDoor();
 	initPlayer();
 	initEnemies();
-
-
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
 }
@@ -63,11 +61,25 @@ void Scene::initEnemies() {
 	for (int i = 0; i < positionEnemies.size(); ++i) {
 		Skeleton* skeleton = new Skeleton();
 		skeleton->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-
 		skeleton->setPosition(glm::vec2(positionEnemies[i].x * map->getTileSize(), positionEnemies[i].y * map->getTileSize()));
 		skeleton->setTileMap(map);
 		skeletons.push_back(skeleton);
 	}
+}
+bool Scene::collide(glm::ivec2 positionSkeleton) {
+	int skeletonX0 =positionSkeleton.x, skeletonX1 = positionSkeleton.x + 32;
+	int skeletonY0 = positionSkeleton.y, skeletonY1 = positionSkeleton.y + 32;
+	int playerX0= player->getPosition().x, playerX1 = player->getPosition().x + 32;
+	int playerY0= player->getPosition().y, playerY1 = player->getPosition().y + 32;
+
+	if ((playerX0 <= skeletonX0 && playerX1 >= skeletonX0)|| (skeletonX0 <= playerX0 && skeletonX1 >= playerX0)) {
+		if ((skeletonY0 <= playerY0 && skeletonY1 >= playerY0)||(playerY0 <= skeletonY0 && playerY1 >= skeletonY0)) {
+			cout << "hit" <<endl;
+			return true;
+		} 
+	}
+	return false;
+	
 }
 void Scene::update(int deltaTime)
 {
@@ -75,11 +87,15 @@ void Scene::update(int deltaTime)
 	player->update(deltaTime);
 	for (int i = 0; i < skeletons.size(); i++) {
 		skeletons[i]->update(deltaTime);
+		if (!player->invulnerable() && collide(skeletons[i]->getPosition())) {
+			player->hit();
+		}
 	}
 	if (map->doorOpened()) {
 		door->open();
 		alreadyOpen = true;
 	}
+	
 	door->update(deltaTime);
 }
 
@@ -95,13 +111,12 @@ void Scene::render()
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
 	map->render();
 	door->render();
-	player->render();
+	if (player->alive()) {
+		player->render();
+	}
 	for (int i = 0; i < skeletons.size(); i++) {
 		skeletons[i]->render();
 	}
-
-	
-
 }
 
 void Scene::initShaders()

@@ -20,7 +20,10 @@ public:
 	
 	void setTileMap(TileMap *tileMap);
 	void setPosition(const glm::vec2 &pos);
-	
+	bool alive();
+	bool invulnerable();
+	void hit();
+	glm::ivec2 getPosition();
 private:
 	bool bJumping;
 	glm::ivec2 tileMapDispl, posPlayer;
@@ -28,7 +31,9 @@ private:
 	Texture spritesheet;
 	Texture textu;
 	Sprite *sprite;
-
+	int lifes = 3;
+	bool invulnerability = false;
+	int invulnerabilityTime = 0;
 	TileMap *map;
 
 };

@@ -19,6 +19,7 @@ enum DoorAnims {
 
 void Door::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) {
 	spritesheet.loadFromFile("images/sprite_portal.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	spritesheet.setMagFilter(GL_NEAREST);
 	sprite = Sprite::createSprite(glm::ivec2(48, 58), glm::vec2(0.125, 1), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(3);
 	
@@ -43,33 +44,16 @@ void Door::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) {
 }
 
 void Door::update(int deltaTime) {
-	sprite->update(deltaTime);/*
-	 if (opened && sprite->animation() == DOOR_CLOSED) {
-		sprite->changeAnimation(DOOR_OPENING);
-		timerDoor = deltaTime;
-		
-		cout << "open" << endl;
-	 }
-	 else  if (opened && sprite->animation() == DOOR_OPENING && deltaTime - timerDoor >= 1300 && timerDoor != -1) {
-			sprite->changeAnimation(DOOR_OPENED);
-			timerDoor = -1;
-			cout << "opening" << endl;
-	}
-	else if(!opened) {
-		sprite->changeAnimation(DOOR_CLOSED);
-		cout << "closed" << endl;
-	}*/
+	sprite->update(deltaTime);
 	
 	if (opened && sprite->animation() == DOOR_CLOSED) {
 		sprite->changeAnimation(DOOR_OPENING);
-		cout << "open" << endl;
 		timerDoor += deltaTime;
 	}
 	if (opened && sprite->animation() == DOOR_OPENING) {
 		timerDoor += deltaTime;
 	}
 	if (opened && sprite->animation() == DOOR_OPENING && timerDoor >= 1000) {
-		opening = false;
 		sprite->changeAnimation(DOOR_OPENED);
 	}
 }

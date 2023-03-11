@@ -43,7 +43,6 @@ public:
 	vector<glm::ivec2> getEnemyPos();
 	glm::ivec2 getDoorPos();
 	bool doorOpened();
-	bool collisionMoveLeftHit(const glm::ivec2& pos, const glm::ivec2& size);
 private:
 	GLuint vao;
 	GLuint vbo;
@@ -57,17 +56,24 @@ private:
 	ShaderProgram ShProgram;
 	Sprite* sprite;
 	bool firstSprite = false;
+	bool firstSpriteL = false;
+	bool firstSpriteR = false;
 	Texture spritesheetSuelo;
 	Sprite* spriteSuelo;
+	Sprite* spriteSueloL;
+	Sprite* spriteSueloR;
 	Texture spritesheetLlave;
 	Sprite* spriteLlave;
 	vector<glm::ivec2> positions;
+	vector<glm::ivec2> positionsL;
+	vector<glm::ivec2> positionsR;
 	int casillasNivel;
 	glm::ivec2 keyCoords;
 	glm::ivec2 doorCoords;
 	vector<glm::ivec2> positionsEnemies;
 	bool showKey = true;
 	bool doorOpen = false;
+
 };
 
 

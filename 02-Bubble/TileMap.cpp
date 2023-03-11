@@ -48,8 +48,16 @@ void TileMap::render()
 			spriteSuelo->setPosition(positions[i]);
 			spriteSuelo->render();
 		}
+		for (int i = 0; i < positionsL.size(); i++) {
+			spriteSueloL->setPosition(positionsL[i]);
+			spriteSueloL->render();
+		}
+		for (int i = 0; i < positionsR.size(); i++) {
+			spriteSueloR->setPosition(positionsR[i]);
+			spriteSueloR->render();
+		}
 	}
-	if (positions.size() >= casillasNivel && showKey) {
+	if (positions.size() + positionsL.size() + positionsR.size() >= casillasNivel && showKey) {
 		spriteLlave->setPosition(glm::ivec2((keyCoords.x + 2) * tileSize, (keyCoords.y + 1) * tileSize));
 		spriteLlave->render();
 	}
@@ -132,15 +140,15 @@ void TileMap::prepareArrays(const glm::vec2& minCoords, ShaderProgram& program)
 		for (int i = 0; i < mapSize.x; i++)
 		{
 			tile = map[j * mapSize.x + i];
-			if (tile == 5) {
+			if (tile == int('c') - int('0')) { // llave
 				keyCoords.x = i;
 				keyCoords.y = j;
 			}
-			if (tile == 6) {
+			if (tile == int('b') - int('0')) { // skeleton
 				glm::ivec2 pos = glm::vec2(i, j);
 				positionsEnemies.push_back(pos);
 			}
-			if (tile == 7) {
+			if (tile == int('a')- int('0')) {
 				doorCoords.x = i;
 				doorCoords.y = j;
 			}
@@ -194,19 +202,18 @@ bool TileMap::collisionMoveEnemy(const glm::ivec2& pos, const glm::ivec2& size, 
 		y0 = pos.y / tileSize;
 		y1 = (pos.y + size.y - 1) / tileSize;
 		for (int y = y0; y <= y1; y++) {
-			if (map[(y + 1) * mapSize.x + x] == 2 || map[(y + 1) * mapSize.x + x] == 1)
+			if (map[(y + 1) * mapSize.x + x] <= 23 && map[(y + 1) * mapSize.x + x] > 0)
 				return false;
 		}
 
 	}
 	else {
 		int x, y0, y1;
-
 		x = pos.x / tileSize;
 		y0 = pos.y / tileSize;
 		y1 = (pos.y + size.y - 1) / tileSize;
 		for (int y = y0; y <= y1; y++) {
-			if (map[(y + 1) * mapSize.x + x] == 2 || map[(y + 1) * mapSize.x + x] == 1)
+			if (map[(y + 1) * mapSize.x + x] <= 23 && map[(y + 1) * mapSize.x + x] > 0 )
 				return false;
 		}
 	}
@@ -221,14 +228,14 @@ bool TileMap::collisionMoveLeft(const glm::ivec2& pos, const glm::ivec2& size, b
 	y1 = (pos.y + size.y - 1) / tileSize;
 	for (int y = y0; y <= y1; y++)
 	{
-		if (map[y * mapSize.x + x] == 7 && !isEnemy && doorOpen) {
+		if (map[y * mapSize.x + x] == 49 && !isEnemy && doorOpen) {
 			cout << "you win" << endl;
 		}
-		if (map[y * mapSize.x + x] == 5 && !isEnemy) {
+		if (map[y * mapSize.x + x] == 51 && !isEnemy) {
 			showKey = false;
 			doorOpen = true;
 		}
-		if (map[y * mapSize.x + x] != 0 && map[y * mapSize.x + x] < 5)
+		if (map[y * mapSize.x + x] != 0 && map[y * mapSize.x + x] < 24)
 			return true;
 	}
 
@@ -243,14 +250,14 @@ bool TileMap::collisionMoveRight(const glm::ivec2& pos, const glm::ivec2& size, 
 	y1 = (pos.y + size.y - 1) / tileSize;
 	for (int y = y0; y <= y1; y++)
 	{
-		if (map[y * mapSize.x + x] == 7 && !isEnemy && doorOpen) {
+		if (map[y * mapSize.x + x] == 49 && !isEnemy && doorOpen) {
 			cout << "you win" << endl;
 		}
-		if (map[y * mapSize.x + x] == 5 && !isEnemy) {
+		if (map[y * mapSize.x + x] == 51 && !isEnemy) {
 			showKey = false;
 			doorOpen = true;
 		}
-		if (map[y * mapSize.x + x] != 0 && map[y * mapSize.x + x] < 5)
+		if (map[y * mapSize.x + x] != 0 && map[y * mapSize.x + x] < 24)
 			return true;
 	}
 
@@ -272,7 +279,7 @@ bool TileMap::collisionMoveDown(const glm::ivec2& pos, const glm::ivec2& size, i
 			showKey = false;
 			doorOpen = true;
 		}
-		if (map[y * mapSize.x + x] != 0 && map[y * mapSize.x + x] < 5)
+		if (map[y * mapSize.x + x] != 0 && map[y * mapSize.x + x] < 24)
 		{
 			if (*posY - tileSize * y + size.y <= 4)
 			{
@@ -281,7 +288,6 @@ bool TileMap::collisionMoveDown(const glm::ivec2& pos, const glm::ivec2& size, i
 			}
 		}
 	}
-
 	return false;
 }
 void TileMap::colisionGroundTileLeft(const glm::ivec2& pos, const glm::ivec2& size)
@@ -294,21 +300,53 @@ void TileMap::colisionGroundTileLeft(const glm::ivec2& pos, const glm::ivec2& si
 	y = (pos.y + size.y - 1) / tileSize + 1;
 	for (int x = x0; x >= x1; x--)
 	{
-		if (map[y * mapSize.x + x] == 2)
+		if (map[y * mapSize.x + x] == 15)
 		{
-			map[y * mapSize.x + x] = 1;
+			map[y * mapSize.x + x] = 16;
 			if (!firstSprite) {
 				spritesheetSuelo.loadFromFile("images/blocks.png", TEXTURE_PIXEL_FORMAT_RGBA);
-				spriteSuelo = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(0.5, 0.5), &spritesheetSuelo, &ShProgram);
+				spritesheetSuelo.setMagFilter(GL_NEAREST);
+				spriteSuelo = Sprite::createSprite(glm::ivec2(16, 16), glm::vec2(0.125, 0.25), &spritesheetSuelo, &ShProgram);
 				spriteSuelo->setNumberAnimations(1);
 				spriteSuelo->setAnimationSpeed(0, 8);
-				spriteSuelo->addKeyframe(0, glm::vec2(0.5f, 0.5f));
+				spriteSuelo->addKeyframe(0, glm::vec2(0.875f, 0.25f));
 				spriteSuelo->changeAnimation(0);
 			}
 			positions.push_back(glm::ivec2((x + 2) * tileSize, (y + 1) * tileSize));
 			firstSprite = true;
 		}
+		else if (map[y * mapSize.x + x] == 18)
+		{
+			map[y * mapSize.x + x] = 12;
+			if (!firstSpriteL) {
+				spritesheetSuelo.loadFromFile("images/blocks.png", TEXTURE_PIXEL_FORMAT_RGBA);
+				spritesheetSuelo.setMagFilter(GL_NEAREST);
+				spriteSueloL = Sprite::createSprite(glm::ivec2(16, 16), glm::vec2(0.125, 0.25), &spritesheetSuelo, &ShProgram);
+				spriteSueloL->setNumberAnimations(1);
+				spriteSueloL->setAnimationSpeed(0, 8);
+				spriteSueloL->addKeyframe(0, glm::vec2(0.375f, 0.25f));
+				spriteSueloL->changeAnimation(0);
+			}
+			positionsL.push_back(glm::ivec2((x + 2) * tileSize, (y + 1) * tileSize));
+			firstSpriteL = true;
+		}
+		else if (map[y * mapSize.x + x] == 6)
+		{
+			map[y * mapSize.x + x] = 17;
+			if (!firstSpriteR) {
+				spritesheetSuelo.loadFromFile("images/blocks.png", TEXTURE_PIXEL_FORMAT_RGBA);
+				spritesheetSuelo.setMagFilter(GL_NEAREST);
+				spriteSueloR = Sprite::createSprite(glm::ivec2(16, 16), glm::vec2(0.125, 0.25), &spritesheetSuelo, &ShProgram);
+				spriteSueloR->setNumberAnimations(1);
+				spriteSueloR->setAnimationSpeed(0, 8);
+				spriteSueloR->addKeyframe(0, glm::vec2(0.0f, 0.5f));
+				spriteSueloR->changeAnimation(0);
+			}
+			positionsR.push_back(glm::ivec2((x + 2) * tileSize, (y + 1) * tileSize));
+			firstSpriteR = true;
+		}
 	}
+
 
 }
 void TileMap::colisionGroundTileRight(const glm::ivec2& pos, const glm::ivec2& size)
@@ -321,23 +359,53 @@ void TileMap::colisionGroundTileRight(const glm::ivec2& pos, const glm::ivec2& s
 	y = (pos.y + size.y - 1) / tileSize + 1;
 	for (int x = x0; x <= x1; x++)
 	{
-		if (map[y * mapSize.x + x] == 2)
+		if (map[y * mapSize.x + x] == 15)
 		{
-			map[y * mapSize.x + x] = 1;
+			map[y * mapSize.x + x] = 16;
 			if (!firstSprite) {
 				spritesheetSuelo.loadFromFile("images/blocks.png", TEXTURE_PIXEL_FORMAT_RGBA);
-				spriteSuelo = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(0.5, 0.5), &spritesheetSuelo, &ShProgram);
+				spritesheetSuelo.setMagFilter(GL_NEAREST);
+				spriteSuelo = Sprite::createSprite(glm::ivec2(16,16), glm::vec2(0.125, 0.25), &spritesheetSuelo, &ShProgram);
 				spriteSuelo->setNumberAnimations(1);
 				spriteSuelo->setAnimationSpeed(0, 8);
-				spriteSuelo->addKeyframe(0, glm::vec2(0.5f, 0.5f));
+				spriteSuelo->addKeyframe(0, glm::vec2(0.875f, 0.25f));
 				spriteSuelo->changeAnimation(0);
 			}
 			positions.push_back(glm::ivec2((x + 2) * tileSize, (y + 1) * tileSize));
 			firstSprite = true;
 		}
+		else if (map[y * mapSize.x + x] == 18)
+		{
+			map[y * mapSize.x + x] = 12;
+			if (!firstSpriteL) {
+				spritesheetSuelo.loadFromFile("images/blocks.png", TEXTURE_PIXEL_FORMAT_RGBA);
+				spritesheetSuelo.setMagFilter(GL_NEAREST);
+				spriteSueloL = Sprite::createSprite(glm::ivec2(16, 16), glm::vec2(0.125, 0.25), &spritesheetSuelo, &ShProgram);
+				spriteSueloL->setNumberAnimations(1);
+				spriteSueloL->setAnimationSpeed(0, 8);
+				spriteSueloL->addKeyframe(0, glm::vec2(0.375f, 0.25f));
+				spriteSueloL ->changeAnimation(0);
+			}
+			positionsL.push_back(glm::ivec2((x + 2) * tileSize, (y + 1) * tileSize));
+			firstSpriteL = true;
+		}
+		else if (map[y * mapSize.x + x] == 6)
+		{
+			map[y * mapSize.x + x] = 17;
+			if (!firstSpriteR) {
+				spritesheetSuelo.loadFromFile("images/blocks.png", TEXTURE_PIXEL_FORMAT_RGBA);
+				spritesheetSuelo.setMagFilter(GL_NEAREST);
+				spriteSueloR = Sprite::createSprite(glm::ivec2(16, 16), glm::vec2(0.125, 0.25), &spritesheetSuelo, &ShProgram);
+				spriteSueloR->setNumberAnimations(1);
+				spriteSueloR->setAnimationSpeed(0, 8);
+				spriteSueloR->addKeyframe(0, glm::vec2(0.0f, 0.5f));
+				spriteSueloR->changeAnimation(0);
+			}
+			positionsR.push_back(glm::ivec2((x + 2) * tileSize, (y + 1) * tileSize));
+			firstSpriteR = true;
+		}
 	}
-}
-
+}	
 vector<glm::ivec2> TileMap::getEnemyPos() {
 	return positionsEnemies;
 }
@@ -347,25 +415,4 @@ glm::ivec2 TileMap::getDoorPos()
 }
 bool TileMap::doorOpened() {
 	return doorOpen;
-}
-
-bool TileMap::collisionMoveLeftHit(const glm::ivec2& pos, const glm::ivec2& size)
-{
-	int x, y0, y1;
-
-	x = pos.x / tileSize;
-	y0 = pos.y / tileSize;
-	y1 = (pos.y + size.y - 1) / tileSize;
-	for (int y = y0; y <= y1; y++) {
-		for (int i = 0; i < positionsEnemies.size(); ++i) {
-			if (positionsEnemies[i].x + size.x > pos.x / tileSize && (pos.x + size.x)/tileSize > positionsEnemies[i].x) {
-				for (int yEnemy = positionsEnemies[i].y / tileSize; yEnemy < (positionsEnemies[i].y + size.y - 1) / tileSize; yEnemy++) {
-					if (yEnemy == i) {
-						//cout << "hit" << endl;
-					}
-				}
-			}
-		}
-	}
-	return false;
 }
